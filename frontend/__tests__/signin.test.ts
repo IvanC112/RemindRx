@@ -39,7 +39,8 @@ describe('signin function', () => {
       password: 'test123',
     });
 
-    expect(redirect).toHaveBeenCalledWith('/home');
+    const result = await signin(mockState, mockFormData);
+    expect(result).toEqual({ success: true });    
   });
 
 

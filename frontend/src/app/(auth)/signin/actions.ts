@@ -2,9 +2,8 @@
 
 import { LoginFormSchema } from "@/lib/formSchemas";
 import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
 
-export async function signin (state: any, formData: FormData) {
+export async function signin(state: any, formData: FormData) {
     const data = {
         email: formData.get('email') as string,
         password: formData.get('password') as string,
@@ -16,6 +15,7 @@ export async function signin (state: any, formData: FormData) {
 
     if (!validatedFields.success) {
         return {
+            success: false,
             errors: validatedFields.error.flatten().fieldErrors
         };
     }
@@ -26,7 +26,13 @@ export async function signin (state: any, formData: FormData) {
 
     if (error) {
         console.error(error);
+        return {
+            success: false,
+            message: error.message
+        };
     }
 
-    redirect('/home')
+    return {
+        success: true
+    };
 }

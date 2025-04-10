@@ -1,10 +1,28 @@
 'use client';
 
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { signin } from './actions';
+import { toast } from "sonner";
+import { useAuth } from "@/app/providers/authprovider";
 
 export default function Signin() {
     const [state, action, isPending] = useActionState(signin, undefined);
+    const router = useRouter();
+    const { refreshAuthState } = useAuth();
+
+    useEffect(() => {
+        if (state?.success) {
+            toast.success("Signed in successfully!");
+            refreshAuthState().then(() => {
+                router.push('/home');
+            });
+        } else if (state?.message) {
+            toast.error(state.message);
+        }
+    }, [state, router, refreshAuthState]);
+
 
     return (
         <> 

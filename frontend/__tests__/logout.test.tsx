@@ -1,12 +1,17 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { Logout } from '@/app/components/logout';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/utils/supabase/client';
+
+const mockRouterPush = jest.fn();
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
+
+import { useRouter } from 'next/navigation';
+(useRouter as jest.Mock).mockReturnValue({
+  push: mockRouterPush,
+});
+
 
 jest.mock('@/utils/supabase/client', () => ({
   supabase: {
@@ -15,6 +20,16 @@ jest.mock('@/utils/supabase/client', () => ({
     },
   },
 }));
+
+jest.mock('@/app/providers/authprovider', () => ({
+  useAuth: () => ({
+    refreshAuthState: jest.fn().mockResolvedValue(undefined),
+  }),
+}));
+
+
+import { Logout } from '@/app/components/logout';
+import { supabase } from '@/utils/supabase/client';
 
 describe('Logout Component', () => {
   it('renders the logout button', () => {
@@ -25,19 +40,16 @@ describe('Logout Component', () => {
 
   it('calls logout button', async () => {
 
-    const mockRouterPush = jest.fn();
-    (useRouter as jest.Mock).mockReturnValue({
-      push: mockRouterPush,
-    });
-
     (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null });
 
     render(<Logout />);
     const button = screen.getByRole('button', { name: /logout/i });
     await fireEvent.click(button);
 
-    expect(supabase.auth.signOut).toHaveBeenCalled();
-    expect(mockRouterPush).toHaveBeenCalledWith('/');
+    await waitFor(() => {
+      expect(supabase.auth.signOut).toHaveBeenCalled();
+      expect(mockRouterPush).toHaveBeenCalledWith('/signin');
+    });
   });
 
   it('handles logout error', async () => {

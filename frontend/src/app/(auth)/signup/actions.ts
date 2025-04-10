@@ -38,7 +38,5 @@ export async function signup (state: any, formData: FormData) {
         last_name: formData.get('last_name'),
     });
     
-    if (error) console.error(error);
-      
-    redirect('/home')
+    if (error) {console.error(error)} else {redirect('/home')}
 }

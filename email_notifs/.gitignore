@@ -33,19 +33,5 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# Ignore local environment files
 .env
-.venv
-
-flake_old.nix
-test_e2e.py
-flake2.nix
-
-
-__pycache__/
-.pytest_cache
-*.pyc
-*.pkl
-
 sms_project_env/
-.DS_Store
